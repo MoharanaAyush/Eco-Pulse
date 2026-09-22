@@ -1,4 +1,7 @@
+const API_URL = import.meta.env.VITE_API_URL || "";
+
 import { useEffect, useMemo, useState } from "react";
+
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -9,6 +12,7 @@ import {
   Tooltip,
   Legend
 } from "chart.js";
+
 import { Line } from "react-chartjs-2";
 
 ChartJS.register(
@@ -38,8 +42,8 @@ function App() {
     try {
       setLoading(true);
 
-      const r1 = await fetch("/api/readings");
-      const r2 = await fetch("/api/anomalies");
+      const r1 = await fetch(`${API_URL}/api/readings`);
+      const r2 = await fetch(`${API_URL}/api/anomalies`);
 
       if (!r1.ok || !r2.ok) {
         throw new Error("Failed to load data");
@@ -86,7 +90,7 @@ function App() {
     }
 
     try {
-      const response = await fetch("/api/readings", {
+      const response = await fetch(`${API_URL}/api/readings`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -152,32 +156,53 @@ function App() {
 
   const totalEnergy = readings
     .filter((item) => item.resource === "energy")
-    .reduce((sum, item) => sum + Number(item.value), 0);
+    .reduce(
+      (sum, item) => sum + Number(item.value),
+      0
+    );
 
   const totalWater = readings
     .filter((item) => item.resource === "water")
-    .reduce((sum, item) => sum + Number(item.value), 0);
+    .reduce(
+      (sum, item) => sum + Number(item.value),
+      0
+    );
 
   const totalWaste = readings
     .filter((item) => item.resource === "waste")
-    .reduce((sum, item) => sum + Number(item.value), 0);
+    .reduce(
+      (sum, item) => sum + Number(item.value),
+      0
+    );
 
   const averageEnergy =
-    readings.filter((item) => item.resource === "energy").length > 0
+    readings.filter(
+      (item) => item.resource === "energy"
+    ).length > 0
       ? totalEnergy /
-        readings.filter((item) => item.resource === "energy").length
+        readings.filter(
+          (item) => item.resource === "energy"
+        ).length
       : 0;
 
   const averageWater =
-    readings.filter((item) => item.resource === "water").length > 0
+    readings.filter(
+      (item) => item.resource === "water"
+    ).length > 0
       ? totalWater /
-        readings.filter((item) => item.resource === "water").length
+        readings.filter(
+          (item) => item.resource === "water"
+        ).length
       : 0;
 
   const averageWaste =
-    readings.filter((item) => item.resource === "waste").length > 0
+    readings.filter(
+      (item) => item.resource === "waste"
+    ).length > 0
       ? totalWaste /
-        readings.filter((item) => item.resource === "waste").length
+        readings.filter(
+          (item) => item.resource === "waste"
+        ).length
       : 0;
 
   const locationData = allLocations.map((loc) => {
@@ -187,15 +212,24 @@ function App() {
 
     const energy = locationReadings
       .filter((item) => item.resource === "energy")
-      .reduce((sum, item) => sum + Number(item.value), 0);
+      .reduce(
+        (sum, item) => sum + Number(item.value),
+        0
+      );
 
     const water = locationReadings
       .filter((item) => item.resource === "water")
-      .reduce((sum, item) => sum + Number(item.value), 0);
+      .reduce(
+        (sum, item) => sum + Number(item.value),
+        0
+      );
 
     const waste = locationReadings
       .filter((item) => item.resource === "waste")
-      .reduce((sum, item) => sum + Number(item.value), 0);
+      .reduce(
+        (sum, item) => sum + Number(item.value),
+        0
+      );
 
     const hasAnomaly = anomalies.some(
       (item) => item.location === loc
@@ -281,8 +315,7 @@ function App() {
 
   const getAnomalyExplanation = (item) => {
     const resourceReadings = readings.filter(
-      (reading) =>
-        reading.resource === item.resource
+      (reading) => reading.resource === item.resource
     );
 
     if (resourceReadings.length === 0) {
@@ -365,12 +398,9 @@ function App() {
 
   return (
     <div className="app">
-
       <header className="top-header">
-
         <div>
           <h1>EcoPulse</h1>
-
           <p>
             Sustainable Resource Monitoring &
             Anomaly Detection
@@ -382,15 +412,11 @@ function App() {
           onClick={loadData}
           disabled={loading}
         >
-          {loading
-            ? "Refreshing..."
-            : "↻ Refresh"}
+          {loading ? "Refreshing..." : "↻ Refresh"}
         </button>
-
       </header>
 
       <div className="stats">
-
         <div className="card">
           <h3>Total Readings</h3>
           <strong>{readings.length}</strong>
@@ -426,18 +452,15 @@ function App() {
             {totalWaste.toFixed(1)} kg
           </strong>
         </div>
-
       </div>
 
       <section>
-
         <h2>Add Resource Reading</h2>
 
         <form
           className="reading-form"
           onSubmit={addReading}
         >
-
           <div>
             <label>Resource</label>
 
@@ -491,15 +514,11 @@ function App() {
           <button type="submit">
             Add Reading
           </button>
-
         </form>
-
       </section>
 
       <section>
-
         <div className="section-header">
-
           <div>
             <h2>Resource Filters</h2>
 
@@ -515,11 +534,9 @@ function App() {
           >
             📥 Export CSV
           </button>
-
         </div>
 
         <div className="filters">
-
           <div>
             <label>Search</label>
 
@@ -590,7 +607,6 @@ function App() {
           >
             Clear Filters
           </button>
-
         </div>
 
         <p className="filter-result">
@@ -604,17 +620,13 @@ function App() {
           </strong>{" "}
           readings
         </p>
-
       </section>
 
       <section>
-
         <h2>Location Overview</h2>
 
         <div className="location-grid">
-
           {locationData.map((item) => (
-
             <div
               className={`location-card ${
                 item.hasAnomaly
@@ -623,9 +635,7 @@ function App() {
               }`}
               key={item.location}
             >
-
               <div className="location-header">
-
                 <h3>{item.location}</h3>
 
                 <span
@@ -639,11 +649,9 @@ function App() {
                     ? "⚠ Anomaly"
                     : "✓ Normal"}
                 </span>
-
               </div>
 
               <div className="location-stats">
-
                 <div>
                   <span>Energy</span>
 
@@ -667,19 +675,13 @@ function App() {
                     {item.waste.toFixed(1)} kg
                   </strong>
                 </div>
-
               </div>
-
             </div>
-
           ))}
-
         </div>
-
       </section>
 
       <section>
-
         <h2>Energy Usage</h2>
 
         <div className="chart-container">
@@ -688,11 +690,9 @@ function App() {
             options={chartOptions}
           />
         </div>
-
       </section>
 
       <section>
-
         <h2>Water Usage</h2>
 
         <div className="chart-container">
@@ -701,11 +701,9 @@ function App() {
             options={chartOptions}
           />
         </div>
-
       </section>
 
       <section>
-
         <h2>Waste Generation</h2>
 
         <div className="chart-container">
@@ -714,13 +712,10 @@ function App() {
             options={chartOptions}
           />
         </div>
-
       </section>
 
       <section>
-
         <div className="section-header">
-
           <div>
             <h2>Resource Readings</h2>
 
@@ -732,15 +727,11 @@ function App() {
           <strong>
             {filteredReadings.length} Records
           </strong>
-
         </div>
 
         <div className="table-container">
-
           <table>
-
             <thead>
-
               <tr>
                 <th>Resource</th>
                 <th>Location</th>
@@ -748,13 +739,10 @@ function App() {
                 <th>Unit</th>
                 <th>Timestamp</th>
               </tr>
-
             </thead>
 
             <tbody>
-
               {filteredReadings.length === 0 ? (
-
                 <tr>
                   <td
                     colSpan="5"
@@ -766,20 +754,14 @@ function App() {
                     No readings found.
                   </td>
                 </tr>
-
               ) : (
-
                 filteredReadings
                   .slice()
                   .reverse()
                   .map((item, index) => (
-
                     <tr
-                      key={
-                        item.id || index
-                      }
+                      key={item.id || index}
                     >
-
                       <td>
                         {item.resource}
                       </td>
@@ -801,25 +783,16 @@ function App() {
                           item.timestamp
                         ).toLocaleString()}
                       </td>
-
                     </tr>
-
                   ))
-
               )}
-
             </tbody>
-
           </table>
-
         </div>
-
       </section>
 
       <section>
-
         <div className="section-header">
-
           <div>
             <h2>
               Anomalies Detected
@@ -832,20 +805,15 @@ function App() {
           </div>
 
           <div className="alert-count">
-
             {anomalies.length} Alert
             {anomalies.length !== 1
               ? "s"
               : ""}
-
           </div>
-
         </div>
 
         {anomalies.length === 0 ? (
-
           <div className="no-anomaly">
-
             <strong>
               ✓ All systems normal
             </strong>
@@ -854,29 +822,21 @@ function App() {
               No unusual resource
               consumption detected.
             </p>
-
           </div>
-
         ) : (
-
           <div className="anomaly-list">
-
             {anomalies.map(
               (item, index) => (
-
                 <div
                   className="anomaly"
                   key={index}
                 >
-
                   <div className="anomaly-icon">
                     !
                   </div>
 
                   <div className="anomaly-info">
-
                     <div className="anomaly-title">
-
                       <strong>
                         ANOMALY DETECTED
                       </strong>
@@ -884,7 +844,6 @@ function App() {
                       <span>
                         {item.resource.toUpperCase()}
                       </span>
-
                     </div>
 
                     <p>
@@ -906,11 +865,9 @@ function App() {
                         item
                       )}
                     </p>
-
                   </div>
 
                   <div className="anomaly-value">
-
                     <strong>
                       {item.value}{" "}
                       {item.unit}
@@ -921,28 +878,19 @@ function App() {
                         item.timestamp
                       ).toLocaleString()}
                     </small>
-
                   </div>
-
                 </div>
-
               )
             )}
-
           </div>
-
         )}
-
       </section>
 
       <section>
-
         <h2>Consumption Insights</h2>
 
         <div className="insight-grid">
-
           <div className="insight-card">
-
             <h3>⚡ Energy</h3>
 
             <p>
@@ -952,11 +900,9 @@ function App() {
             <strong>
               {averageEnergy.toFixed(1)} kWh
             </strong>
-
           </div>
 
           <div className="insight-card">
-
             <h3>💧 Water</h3>
 
             <p>
@@ -966,11 +912,9 @@ function App() {
             <strong>
               {averageWater.toFixed(1)} L
             </strong>
-
           </div>
 
           <div className="insight-card">
-
             <h3>♻ Waste</h3>
 
             <p>
@@ -980,15 +924,11 @@ function App() {
             <strong>
               {averageWaste.toFixed(1)} kg
             </strong>
-
           </div>
-
         </div>
-
       </section>
 
       <footer className="footer">
-
         <strong>
           EcoPulse
         </strong>
@@ -997,9 +937,7 @@ function App() {
           Sustainable Resource Monitoring
           Platform
         </span>
-
       </footer>
-
     </div>
   );
 }
