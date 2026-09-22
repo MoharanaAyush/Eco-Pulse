@@ -1,26 +1,28 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import sqlite3
 from datetime import datetime
-
 import numpy as np
 from sklearn.ensemble import IsolationForest
 
-
 app = FastAPI(title="EcoPulse")
 
-
-# -----------------------------
-# DATABASE
-# -----------------------------
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "https://eco-pulse-0pc6.onrender.com"
+    ],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 DATABASE = "ecopulse.db"
 
 
 def create_database():
-
     connection = sqlite3.connect(DATABASE)
-
     cursor = connection.cursor()
 
     cursor.execute("""
@@ -35,46 +37,29 @@ def create_database():
     """)
 
     connection.commit()
-
     connection.close()
 
 
 create_database()
 
 
-# -----------------------------
-# DATA MODEL
-# -----------------------------
-
 class Reading(BaseModel):
-
     resource: str
     location: str
     value: float
     unit: str
 
 
-# -----------------------------
-# HOME
-# -----------------------------
-
 @app.get("/")
 def home():
-
     return {
         "message": "EcoPulse is running!"
     }
 
 
-# -----------------------------
-# ADD READING
-# -----------------------------
-
 @app.post("/api/readings")
 def add_reading(reading: Reading):
-
     connection = sqlite3.connect(DATABASE)
-
     cursor = connection.cursor()
 
     timestamp = datetime.now().isoformat()
@@ -92,7 +77,6 @@ def add_reading(reading: Reading):
     ))
 
     connection.commit()
-
     connection.close()
 
     return {
@@ -101,15 +85,9 @@ def add_reading(reading: Reading):
     }
 
 
-# -----------------------------
-# GET ALL READINGS
-# -----------------------------
-
 @app.get("/api/readings")
 def get_readings():
-
     connection = sqlite3.connect(DATABASE)
-
     cursor = connection.cursor()
 
     cursor.execute("""
@@ -119,13 +97,11 @@ def get_readings():
     """)
 
     rows = cursor.fetchall()
-
     connection.close()
 
     readings = []
 
     for row in rows:
-
         readings.append({
             "id": row[0],
             "resource": row[1],
@@ -138,15 +114,9 @@ def get_readings():
     return readings
 
 
-# -----------------------------
-# AI ANOMALY DETECTION
-# -----------------------------
-
 @app.get("/api/anomalies")
 def detect_anomalies():
-
     connection = sqlite3.connect(DATABASE)
-
     cursor = connection.cursor()
 
     cursor.execute("""
@@ -156,16 +126,13 @@ def detect_anomalies():
     """)
 
     rows = cursor.fetchall()
-
     connection.close()
 
     groups = {}
 
     for row in rows:
-
         resource = row[0]
         location = row[1]
-
         key = (resource, location)
 
         if key not in groups:
@@ -196,9 +163,7 @@ def detect_anomalies():
             readings,
             predictions
         ):
-
             if prediction == -1:
-
                 anomalies.append({
                     "resource": reading[0],
                     "location": reading[1],
